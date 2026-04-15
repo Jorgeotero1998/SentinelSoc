@@ -19,10 +19,10 @@ class SentinelIntelligence(FileSystemEventHandler):
         except:
             pass
 
-    def detect_ransomware(self):
+    def detect_velocity(self):
         now = time.time()
-        recent_events = [t for t in event_history if now - t < 1.0]
-        return len(recent_events) > RANSOMWARE_THRESHOLD
+        recent = [t for t in event_history if now - t < 1.0]
+        return len(recent) > RANSOMWARE_THRESHOLD
 
     def on_any_event(self, event):
         if not event.is_directory:
@@ -31,35 +31,46 @@ class SentinelIntelligence(FileSystemEventHandler):
             current_time = datetime.now()
             event_history.append(current_time.timestamp())
             if len(event_history) > 100: event_history.pop(0)
+            
             event_data = {
-                "timestamp": current_time.strftime("%Y-%m-%d %H:%M:%S"),
-                "event_type": event.event_type.upper(),
+                "timestamp": current_time.strftime("%H:%M:%S"),
+                "action": event.event_type.upper(),
                 "file": os.path.basename(event.src_path),
-                "severity": "LOW"
+                "status": "OK"
             }
-            if self.detect_ransomware():
-                event_data["severity"] = "CRITICAL"
-                print(f"\n[🚨] ALERTA: ACTIVIDAD SOSPECHOSA EN {event_data['file']}")
+
+            if self.detect_velocity():
+                event_data["status"] = "CRITICAL"
+                print(f"[{current_time.strftime('%H:%M:%S')}] 🚨 ALERTA: Actividad masiva detectada en {event_data['file']}")
             else:
-                print(f"[+] Monitor: {event_data['event_type']} -> {event_data['file']}")
+                print(f"[{current_time.strftime('%H:%M:%S')}] [+] {event_data['action']}: {event_data['file']}")
+            
             self.save_to_db(event_data)
 
 if __name__ == "__main__":
     os.system('cls')
-    print("="*60 + "\n                SENTINEL BY JORGE OTERO\n" + "="*60)
+    print("-" * 50)
+    print("             SENTINEL | BY JORGE OTERO")
+    print("-" * 50)
+    
     try:
         key = winreg.OpenKey(winreg.HKEY_CURRENT_USER, r"Software\Microsoft\Windows\CurrentVersion\Explorer\Shell Folders")
         target_path, _ = winreg.QueryValueEx(key, "Desktop")
     except:
         target_path = os.path.join(os.environ['USERPROFILE'], 'Desktop')
-    print(f"[*] Escaneando: {target_path}")
-    print("[*] Proteccion Heuristica: ACTIVA")
-    print("[!] Sistema Operativo y Protegiendo...\n")
+
+    print(f"[*] RUTA: {target_path}")
+    print(f"[*] ESTADO: Vigilancia activa")
+    print("[*] LOGS: logs/forensic_audit.json")
+    print("-" * 50 + "\n")
+
     observer = Observer()
     observer.schedule(SentinelIntelligence(), target_path, recursive=False)
     observer.start()
+
     try:
-        while True: time.sleep(0.1)
+        while True:
+            time.sleep(0.1)
     except KeyboardInterrupt:
         observer.stop()
     observer.join()
