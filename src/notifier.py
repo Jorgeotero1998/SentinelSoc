@@ -3,7 +3,7 @@ import json
 
 class SOCNotifier:
     def __init__(self):
-        # Aquí pegarás la URL de tu Webhook de Discord o Slack después
+        
         self.webhook_url = "TU_WEBHOOK_AQUI"
 
     def send_alert(self, ip, malicious_count, details):
