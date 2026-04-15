@@ -8,44 +8,39 @@ except ImportError:
     import time
 
 LOG_FILE = "logs/forensic_audit.json"
-RANSOMWARE_THRESHOLD = 4
-event_history = []
+LIMIT = 4
+history = []
 
-class SentinelIntelligence(FileSystemEventHandler):
-    def save_to_db(self, data):
+class Sentinel(FileSystemEventHandler):
+    def save(self, data):
         try:
             with open(LOG_FILE, "a", encoding="utf-8") as f:
                 f.write(json.dumps(data) + "\n")
-        except:
-            pass
-
-    def detect_velocity(self):
-        now = time.time()
-        recent = [t for t in event_history if now - t < 1.0]
-        return len(recent) > RANSOMWARE_THRESHOLD
+        except: pass
 
     def on_any_event(self, event):
         if not event.is_directory:
-            if any(x in event.src_path.lower() for x in [".tmp", ".ini", "desktop.ini"]):
-                return
-            current_time = datetime.now()
-            event_history.append(current_time.timestamp())
-            if len(event_history) > 100: event_history.pop(0)
+            if any(x in event.src_path.lower() for x in [".tmp", ".ini", "desktop.ini"]): return
             
-            event_data = {
-                "timestamp": current_time.strftime("%H:%M:%S"),
-                "action": event.event_type.upper(),
-                "file": os.path.basename(event.src_path),
-                "status": "OK"
+            now = datetime.now()
+            history.append(now.timestamp())
+            if len(history) > 50: history.pop(0)
+            
+            # Cálculo de ráfaga
+            recent = [t for t in history if now.timestamp() - t < 1.0]
+            
+            entry = {
+                "t": now.strftime("%H:%M:%S"),
+                "ev": event.event_type.upper(),
+                "file": os.path.basename(event.src_path)
             }
 
-            if self.detect_velocity():
-                event_data["status"] = "CRITICAL"
-                print(f"[{current_time.strftime('%H:%M:%S')}] 🚨 ALERTA: Actividad masiva detectada en {event_data['file']}")
+            if len(recent) > LIMIT:
+                print(f"[{entry['t']}] 🚨 ALERTA: Rafaga detectada -> {entry['file']}")
             else:
-                print(f"[{current_time.strftime('%H:%M:%S')}] [+] {event_data['action']}: {event_data['file']}")
+                print(f"[{entry['t']}] [+] {entry['ev']}: {entry['file']}")
             
-            self.save_to_db(event_data)
+            self.save(entry)
 
 if __name__ == "__main__":
     os.system('cls')
@@ -55,22 +50,19 @@ if __name__ == "__main__":
     
     try:
         key = winreg.OpenKey(winreg.HKEY_CURRENT_USER, r"Software\Microsoft\Windows\CurrentVersion\Explorer\Shell Folders")
-        target_path, _ = winreg.QueryValueEx(key, "Desktop")
+        path, _ = winreg.QueryValueEx(key, "Desktop")
     except:
-        target_path = os.path.join(os.environ['USERPROFILE'], 'Desktop')
+        path = os.path.join(os.environ['USERPROFILE'], 'Desktop')
 
-    print(f"[*] RUTA: {target_path}")
-    print(f"[*] ESTADO: Vigilancia activa")
-    print("[*] LOGS: logs/forensic_audit.json")
+    print(f"[*] RUTA: {path}")
+    print(f"[*] STATUS: Activo")
     print("-" * 50 + "\n")
 
-    observer = Observer()
-    observer.schedule(SentinelIntelligence(), target_path, recursive=False)
-    observer.start()
-
+    obs = Observer()
+    obs.schedule(Sentinel(), path, recursive=False)
+    obs.start()
     try:
-        while True:
-            time.sleep(0.1)
-    except KeyboardInterrupt:
-        observer.stop()
-    observer.join()
+        while True: time.sleep(0.1)
+    except:
+        obs.stop()
+    obs.join()
