@@ -14,8 +14,12 @@ The core system combines low-level Windows API access with local heuristic analy
 *   **Intelligent Path Discovery:** Automatic inspection of the Windows Registry to dynamically map critical operating system paths and monitor sensitive user directories.
 *   **Structured Forensic Auditing:** Generation of persistent logs in structured JSON format, ready for direct ingestion into SIEM solutions (Splunk, Elastic, Azure Sentinel).
 
----
+## Screenshots
+<img width="1270" height="682" alt="Captura de pantalla 2026-04-15 174835" src="https://github.com/user-attachments/assets/6194977e-791d-4277-8c7f-af80863d55d7" />
+<img width="1273" height="680" alt="Captura de pantalla 2026-04-15 174902" src="https://github.com/user-attachments/assets/39a7d664-5756-4093-a138-dc504c2a5482" />
+<img width="1257" height="612" alt="Captura de pantalla 2026-04-15 174928" src="https://github.com/user-attachments/assets/f3159ee6-5699-4090-b791-55b0e452886a" />
 
+---
 ## 📁 Project Structure
 
 ```text
@@ -29,10 +33,6 @@ SentinelSoc/
 └── requirements.txt     # Environment execution dependencies
 
 
-## Screenshots
-<img width="1270" height="682" alt="Captura de pantalla 2026-04-15 174835" src="https://github.com/user-attachments/assets/6194977e-791d-4277-8c7f-af80863d55d7" />
-<img width="1273" height="680" alt="Captura de pantalla 2026-04-15 174902" src="https://github.com/user-attachments/assets/39a7d664-5756-4093-a138-dc504c2a5482" />
-<img width="1257" height="612" alt="Captura de pantalla 2026-04-15 174928" src="https://github.com/user-attachments/assets/f3159ee6-5699-4090-b791-55b0e452886a" />
 
 
 🛠️ Installation
