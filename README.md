@@ -1,13 +1,32 @@
-## Sentinel by Jorge Otero
+# SentinelSoc 🛡️
+> Lightweight Windows EDR Engine for Behavioral Threat Detection & Forensic Telemetry Logging.
 
-Sentinel is an advanced cybersecurity tool designed for real-time threat detection and integrity monitoring in Windows environments.
+Sentinel is an Endpoint Detection and Response (EDR) engine focused on early behavior-based threat detection and real-time file integrity monitoring within Windows environments, designed for SOC analysts and SecOps teams.
 
-🚀 Features
+---
 
-Heuristic Detection: Identifies patterns of mass attacks (Ransomware) by analyzing event frequency.
-Forensic Auditing: Persistent log in structured JSON format for later analysis.
-Low-Level Interface: Direct connection to the Windows kernel for file monitoring.
-Intelligent Compatibility: Automatic detection of critical paths using the Windows Registry.
+## 🚀 Architecture & Technical Capabilities
+
+The core system combines low-level Windows API access with local heuristic analysis to process events efficiently without compromising system performance.
+
+*   **Heuristic Ransomware Detection:** An algorithm that analyzes the frequency rate of Input/Output (I/O) events. If massive modifications are detected within a critical time threshold, it mitigates the impact and identifies the attack pattern.
+*   **Low-Level Kernel Interface:** Direct connection via Windows API calls for file system event capture, ensuring real-time telemetry.
+*   **Intelligent Path Discovery:** Automatic inspection of the Windows Registry to dynamically map critical operating system paths and monitor sensitive user directories.
+*   **Structured Forensic Auditing:** Generation of persistent logs in structured JSON format, ready for direct ingestion into SIEM solutions (Splunk, Elastic, Azure Sentinel).
+
+---
+
+## 📁 Project Structure
+
+```text
+SentinelSoc/
+├── src/
+│   ├── monitor.py       # Core EDR engine and event capture loop
+│   ├── notifier.py      # Alerting module, telemetry dispatch, and response logic
+│   └── utils.py         # Windows API abstractions and Registry queries
+├── logs/                # Local storage for forensic audit logs (JSON)
+├── Iniciar_Sentinel.bat # Automated quick-deployment script
+└── requirements.txt     # Environment execution dependencies
 
 
 ## Screenshots
